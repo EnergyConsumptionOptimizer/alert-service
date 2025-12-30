@@ -1,0 +1,67 @@
+{
+  "name": "template-for-typescript-projects",
+  "engines": {
+    "node": "24.12"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/app.js",
+    "start:dev": "ts-node-dev --respawn --transpile-only -r tsconfig-paths/register src/app.ts",
+    "test": "npx vitest run",
+    "lint": "npx eslint \"src/**/*.{ts,js}\"",
+    "lint:fix": "npx eslint \"src/**/*.{ts,js}\" --fix",
+    "format": "prettier --write \"src/**/*.{ts,js}\" --ignore-unknown",
+    "format:check": "npx prettier --c \"src/**/*.{ts,js}\" --ignore-unknown",
+    "docs": "npx typedoc --entryPointStrategy expand ./src --plugin typedoc-github-theme",
+    "lint-staged": "lint-staged"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint",
+      "prettier --write --ignore-unknown"
+    ]
+  },
+  "dependencies": {
+    "axios": "^1.10.0",
+    "bcrypt": "^6.0.0",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^9.0.0",
+    "reflect-metadata": "^0.2.2",
+    "uuid": "^13.0.0",
+    "yamljs": "^0.3.0",
+    "zod": "^4.1.12"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@types/bcrypt": "^6.0.0",
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^24.3.0",
+    "@types/supertest": "^6.0.3",
+    "@types/yamljs": "^0.2.34",
+    "@typescript-eslint/eslint-plugin": "^8.42.0",
+    "@typescript-eslint/parser": "^8.42.0",
+    "eslint": "^9.35.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "typescript-eslint": "^8.42.0",
+    "typedoc": "^0.28.12",
+    "jiti": "^2.5.1",
+    "globals": "^16.3.0",
+    "lint-staged": "^16.0.0",
+    "prettier": "^3.6.2",
+    "rimraf": "^6.0.1",
+    "supertest": "^7.1.4",
+    "ts-node-dev": "^2.0.0",
+    "tsc-alias": "^1.8.16",
+    "typedoc-github-theme": "^0.3.1",
+    "typescript": "^5.9.2",
+    "vitest": "^4.0.0",
+    "tsconfig-paths": "^4.2.0",
+    "vite-tsconfig-paths": "^6.0.0",
+    "semantic-release-preconfigured-conventional-commits": "^1.1.152"
+  }
+}
