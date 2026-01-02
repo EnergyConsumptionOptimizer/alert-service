@@ -13,4 +13,4 @@ gitHooks {
     createHooks(true)
 }
 
-rootProject.name = "Template-for-TypeScript-projects"
+rootProject.name = "alert-service"
