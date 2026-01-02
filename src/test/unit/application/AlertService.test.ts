@@ -24,12 +24,12 @@ describe("AlertService", () => {
 
   const command: CreateAlertCommand = {
     thresholdId: "t-1",
-    thresholdName: "High Voltage",
+    thresholdName: "High electricity usage",
     utilityType: "Electricity",
-    thresholdType: "MAX",
-    periodType: "DAILY",
-    limitValue: 220,
-    detectedValue: 240,
+    thresholdType: "ACTUAL",
+    periodType: "",
+    limitValue: 2.2,
+    detectedValue: 2.5,
   };
 
   beforeEach(() => {
