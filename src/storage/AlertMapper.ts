@@ -35,7 +35,7 @@ export function toDomain(doc: AlertDocument): Alert {
     doc.details.thresholdName,
     doc.details.utilityType,
     doc.details.thresholdType,
-    doc.details.periodType,
+    doc.details.periodType ?? undefined,
     doc.details.limitValue,
     doc.details.detectedValue,
   );

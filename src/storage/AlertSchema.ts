@@ -9,7 +9,7 @@ const AlertSchema = new Schema(
       thresholdName: { type: String, required: true },
       utilityType: { type: String, required: true },
       thresholdType: { type: String, required: true },
-      periodType: { type: String, required: true },
+      periodType: { type: String, required: false },
       limitValue: { type: Number, required: true },
       detectedValue: { type: Number, required: true },
     },
