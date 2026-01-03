@@ -10,7 +10,7 @@ export class BreachDetails {
     public readonly thresholdName: string,
     public readonly utilityType: string,
     public readonly thresholdType: string,
-    public readonly periodType: string,
+    public readonly periodType: string | undefined,
     public readonly limitValue: number,
     public readonly detectedValue: number,
   ) {}
