@@ -17,6 +17,8 @@ const createPublicRouter = (
   const router = Router();
   router.get("/:id", auth.authenticate, controller.getById);
   router.get("/", auth.authenticate, controller.getAll);
+  router.delete("/:id", auth.authenticateAdmin, controller.deleteOne);
+  router.delete("/", auth.authenticateAdmin, controller.deleteAll);
   return router;
 };
 

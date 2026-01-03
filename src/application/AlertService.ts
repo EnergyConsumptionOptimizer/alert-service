@@ -50,4 +50,13 @@ export class AlertService {
   async getAll(): Promise<Alert[]> {
     return this.repository.findAll();
   }
+
+  async deleteOne(id: string): Promise<void> {
+    const alertId = AlertId.of(id);
+    await this.repository.deleteOne(alertId);
+  }
+
+  async deleteAll(): Promise<void> {
+    await this.repository.deleteAll();
+  }
 }

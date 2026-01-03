@@ -24,4 +24,22 @@ export class AlertController {
       next(error);
     }
   };
+
+  deleteOne = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this.service.deleteOne(req.params.id);
+      res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  deleteAll = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this.service.deleteAll();
+      res.status(200).json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
 }

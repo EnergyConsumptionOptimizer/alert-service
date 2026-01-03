@@ -5,4 +5,6 @@ export interface AlertRepository {
   save(alert: Alert): Promise<void>;
   findById(id: AlertId): Promise<Alert | null>;
   findAll(): Promise<Alert[]>;
+  deleteOne(id: AlertId): Promise<void>;
+  deleteAll(): Promise<void>;
 }

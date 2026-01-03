@@ -23,4 +23,12 @@ export class MongoAlertRepository implements AlertRepository {
     const docs = await AlertModel.find().sort({ createdAt: -1 }).exec();
     return docs.map(AlertMapper.toDomain);
   }
+
+  async deleteOne(id: AlertId): Promise<void> {
+    await AlertModel.deleteOne({ _id: id.value }).exec();
+  }
+
+  async deleteAll(): Promise<void> {
+    await AlertModel.deleteMany({}).exec();
+  }
 }
