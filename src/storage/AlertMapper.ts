@@ -11,6 +11,7 @@ export function toPersistence(entity: Alert): AlertDocument {
     createdAt: entity.createdAt,
     sentAt: entity.sentAt,
     failReason: entity.failReason,
+    readAt: entity.readAt,
     details: {
       thresholdId: entity.details.thresholdId,
       thresholdName: entity.details.thresholdName,
@@ -47,5 +48,6 @@ export function toDomain(doc: AlertDocument): Alert {
     doc.status as AlertStatus,
     doc.sentAt ? new Date(doc.sentAt) : undefined,
     doc.failReason ?? undefined,
+    doc.readAt ? new Date(doc.readAt) : undefined,
   );
 }

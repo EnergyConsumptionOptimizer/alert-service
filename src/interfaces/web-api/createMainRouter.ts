@@ -15,10 +15,20 @@ const createPublicRouter = (
   auth: AuthMiddleware,
 ): Router => {
   const router = Router();
-  router.get("/:id", auth.authenticate, controller.getById);
-  router.get("/", auth.authenticate, controller.getAll);
-  router.delete("/:id", auth.authenticateAdmin, controller.deleteOne);
-  router.delete("/", auth.authenticateAdmin, controller.deleteAll);
+
+  router
+    .route("/")
+    .get(auth.authenticate, controller.getAll)
+    .delete(auth.authenticateAdmin, controller.deleteAll);
+
+  router
+    .route("/:id")
+    .get(auth.authenticate, controller.getById)
+    .delete(auth.authenticateAdmin, controller.deleteOne);
+
+  router.get("/unread-count", auth.authenticate, controller.getUnreadCount);
+  router.patch("/:id/read", auth.authenticate, controller.markAsRead);
+
   return router;
 };
 

@@ -51,6 +51,16 @@ export class AlertService {
     return this.repository.findAll();
   }
 
+  async getUnreadCount(): Promise<number> {
+    return this.repository.countUnread();
+  }
+
+  async markAsRead(id: string): Promise<void> {
+    const alert = await this.getById(id);
+    alert.markAsRead();
+    await this.repository.save(alert);
+  }
+
   async deleteOne(id: string): Promise<void> {
     const alertId = AlertId.of(id);
     await this.repository.deleteOne(alertId);

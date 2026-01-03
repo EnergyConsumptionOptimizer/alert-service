@@ -1,6 +1,6 @@
-import * as AlertMapper from "@storage/AlertMapper";
+import * as AlertMapper from "./AlertMapper";
 import { AlertRepository } from "@domain/port/AlertRepository";
-import { AlertModel } from "storage/AlertSchema";
+import { AlertModel } from "./AlertSchema";
 import { AlertId } from "@domain/value/AlertId";
 import { Alert } from "@domain/Alert";
 
@@ -22,6 +22,12 @@ export class MongoAlertRepository implements AlertRepository {
   async findAll(): Promise<Alert[]> {
     const docs = await AlertModel.find().sort({ createdAt: -1 }).exec();
     return docs.map(AlertMapper.toDomain);
+  }
+
+  async countUnread(): Promise<number> {
+    return AlertModel.countDocuments({
+      $or: [{ readAt: null }, { readAt: { $exists: false } }],
+    }).exec();
   }
 
   async deleteOne(id: AlertId): Promise<void> {

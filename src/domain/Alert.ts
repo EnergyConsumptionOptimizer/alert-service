@@ -11,6 +11,7 @@ export class Alert {
     private _status: AlertStatus,
     private _sentAt?: Date,
     private _failReason?: string,
+    private _readAt?: Date,
   ) {}
 
   static create(details: BreachDetails): Alert {
@@ -30,6 +31,7 @@ export class Alert {
     status: AlertStatus,
     sentAt?: Date | string,
     failReason?: string,
+    readAt?: Date | string,
   ): Alert {
     const validCreatedAt =
       typeof createdAt === "string"
@@ -39,6 +41,9 @@ export class Alert {
     const validSentAt =
       typeof sentAt === "string" ? parseISO8601DateTime(sentAt) : sentAt;
 
+    const validReadAt =
+      typeof readAt === "string" ? parseISO8601DateTime(readAt) : readAt;
+
     return new Alert(
       id,
       details,
@@ -46,6 +51,7 @@ export class Alert {
       status,
       validSentAt,
       failReason,
+      validReadAt,
     );
   }
 
@@ -61,6 +67,11 @@ export class Alert {
     this._failReason = reason;
   }
 
+  public markAsRead(): void {
+    if (this._readAt) return;
+    this._readAt = new Date();
+  }
+
   get status(): AlertStatus {
     return this._status;
   }
@@ -69,5 +80,11 @@ export class Alert {
   }
   get failReason(): string | undefined {
     return this._failReason;
+  }
+  get readAt(): Date | undefined {
+    return this._readAt;
+  }
+  get isRead(): boolean {
+    return !!this._readAt;
   }
 }

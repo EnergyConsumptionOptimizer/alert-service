@@ -21,6 +21,7 @@ const AlertSchema = new Schema(
     },
     createdAt: { type: Date, required: true },
     sentAt: { type: Date, required: false },
+    readAt: { type: Date, required: false, default: null },
     failReason: { type: String, required: false },
   },
   {

@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { AlertService } from "@application/AlertService";
-import * as AlertPresenter from "@interfaces/web-api/presenter/AlertPresenter";
+import * as AlertPresenter from "./presenter/AlertPresenter";
 
 export class AlertController {
   constructor(private readonly service: AlertService) {}
@@ -20,6 +20,24 @@ export class AlertController {
       const alerts = await this.service.getAll();
       const response = alerts.map(AlertPresenter.toResponse);
       res.status(200).json({ success: true, data: response });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  getUnreadCount = async (_req: Request, res: Response, next: NextFunction) => {
+    try {
+      const count = await this.service.getUnreadCount();
+      res.status(200).json({ success: true, data: { count } });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  markAsRead = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await this.service.markAsRead(req.params.id);
+      res.status(204).send();
     } catch (error) {
       next(error);
     }
