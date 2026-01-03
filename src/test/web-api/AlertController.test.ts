@@ -83,4 +83,41 @@ describe("Public API Integration (AlertController)", () => {
       expect(mockAlertService.deleteAll).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe("GET /api/unread-count", () => {
+    it("should return the count of unread alerts", async () => {
+      mockAlertService.getUnreadCount.mockResolvedValue(5);
+
+      const res = await request(app).get("/api/unread-count");
+
+      expect(res.status).toBe(200);
+      expect(res.body.data.count).toBe(5);
+      expect(mockAlertService.getUnreadCount).toHaveBeenCalled();
+    });
+  });
+
+  describe("PATCH /api/:id/read", () => {
+    it("should mark alert as read and return 204", async () => {
+      const targetId = "abc-123";
+      mockAlertService.markAsRead
+        .calledWith(targetId)
+        .mockResolvedValue(undefined);
+
+      const res = await request(app).patch(`/api/${targetId}/read`);
+
+      expect(res.status).toBe(204);
+      expect(mockAlertService.markAsRead).toHaveBeenCalledWith(targetId);
+    });
+
+    it("should return 404 if alert to mark read is not found", async () => {
+      const targetId = "missing-id";
+      mockAlertService.markAsRead
+        .calledWith(targetId)
+        .mockRejectedValue(new AlertNotFoundError(targetId));
+
+      const res = await request(app).patch(`/api/${targetId}/read`);
+
+      expect(res.status).toBe(404);
+    });
+  });
 });

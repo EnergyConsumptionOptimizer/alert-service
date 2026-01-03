@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from "vitest";
+import { describe, vi, it, expect, beforeEach } from "vitest";
 import { mock, mockReset } from "vitest-mock-extended";
 import { AlertRepository } from "@domain/port/AlertRepository";
 import { AlertSender } from "@application/port/AlertSender";
@@ -36,7 +36,6 @@ describe("AlertService", () => {
 
       expect(resultId).toBeInstanceOf(AlertId);
       expect(mockSender.send).toHaveBeenCalledTimes(1);
-
       expect(mockRepo.save).toHaveBeenCalledTimes(2);
 
       const lastSavedAlert = mockRepo.save.mock.calls[1][0];
@@ -50,7 +49,6 @@ describe("AlertService", () => {
       await service.createAndSend(command);
 
       expect(mockRepo.save).toHaveBeenCalledTimes(2);
-
       const lastSavedAlert = mockRepo.save.mock.calls[1][0];
       expect(lastSavedAlert.status).toBe(AlertStatus.FAILED);
       expect(lastSavedAlert.failReason).toBe(errorMsg);
@@ -61,7 +59,6 @@ describe("AlertService", () => {
     it("should return the alert if found", async () => {
       const idString = "valid-uuid";
       const mockAlert = { id: { value: idString } } as unknown as Alert;
-
       mockRepo.findById.mockResolvedValue(mockAlert);
 
       const result = await service.getById(idString);
@@ -91,6 +88,43 @@ describe("AlertService", () => {
     });
   });
 
+  describe("getUnreadCount", () => {
+    it("should return the count from repository", async () => {
+      mockRepo.countUnread.mockResolvedValue(5);
+
+      const result = await service.getUnreadCount();
+
+      expect(result).toBe(5);
+      expect(mockRepo.countUnread).toHaveBeenCalled();
+    });
+  });
+
+  describe("markAsRead", () => {
+    it("should fetch, mark as read, and save the alert", async () => {
+      const idString = "alert-id";
+      const mockAlert = {
+        markAsRead: vi.fn(),
+        id: { value: idString },
+      } as unknown as Alert;
+
+      mockRepo.findById.mockResolvedValue(mockAlert);
+
+      await service.markAsRead(idString);
+
+      expect(mockRepo.findById).toHaveBeenCalled();
+      expect(mockAlert.markAsRead).toHaveBeenCalled();
+      expect(mockRepo.save).toHaveBeenCalledWith(mockAlert);
+    });
+
+    it("should throw AlertNotFoundError if alert does not exist", async () => {
+      mockRepo.findById.mockResolvedValue(null);
+
+      await expect(service.markAsRead("missing-id")).rejects.toThrow(
+        AlertNotFoundError,
+      );
+    });
+  });
+
   describe("deleteOne", () => {
     it("should delegate deletion to the repository with correct AlertId", async () => {
       const idString = "valid-uuid-to-delete";
@@ -99,7 +133,6 @@ describe("AlertService", () => {
       await service.deleteOne(idString);
 
       expect(mockRepo.deleteOne).toHaveBeenCalledTimes(1);
-
       const calledArg = mockRepo.deleteOne.mock.calls[0][0];
       expect(calledArg).toBeInstanceOf(AlertId);
       expect(calledArg.value).toBe(idString);

@@ -10,6 +10,7 @@ export const AlertFactory = {
       status: AlertStatus.PENDING,
       createdAt: new Date(),
       sentAt: null,
+      readAt: null,
       failReason: null,
       details: new BreachDetails(
         "t-1",

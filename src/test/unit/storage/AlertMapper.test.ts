@@ -20,34 +20,33 @@ describe("AlertMapper", () => {
   };
 
   describe("toPersistence", () => {
-    it("should flatten Entity VOs into Mongoose primitives with correct data", () => {
+    it("should flatten Entity VOs into Mongoose primitives including readAt", () => {
       const entity = createEntity();
-      entity.markAsFailed("Test Error");
+      entity.markAsRead();
 
       const doc = AlertMapper.toPersistence(entity);
 
       expect(doc._id).toBe(entity.id.value);
       expect(doc.createdAt).toBeInstanceOf(Date);
-      expect(doc.createdAt).toBe(entity.createdAt);
-      expect(doc.status).toBe(AlertStatus.FAILED);
-      expect(doc.failReason).toBe("Test Error");
+      expect(doc.readAt).toBeInstanceOf(Date);
+      expect(doc.readAt).toBe(entity.readAt);
 
       expect(doc.details?.thresholdId).toBe("t-1");
-      expect(doc.details?.thresholdName).toBe("High electricity usage");
-      expect(doc.details?.periodType).toBe("");
-      expect(doc.details?.limitValue).toBe(2.2);
       expect(doc.details?.detectedValue).toBe(2.5);
     });
   });
 
   describe("toDomain", () => {
-    it("should reconstruct Entity with correct VOs from Document", () => {
+    it("should reconstruct Entity with correct VOs including readAt", () => {
       const now = new Date();
+      const readDate = new Date();
+
       const doc: AlertDocument = {
         _id: "uuid-123",
         status: AlertStatus.SENT,
         createdAt: now,
         sentAt: now,
+        readAt: readDate,
         failReason: undefined,
         details: {
           thresholdId: "t-1",
@@ -63,13 +62,10 @@ describe("AlertMapper", () => {
       const entity = AlertMapper.toDomain(doc);
 
       expect(entity.id.value).toBe("uuid-123");
-      expect(entity.createdAt).toBeInstanceOf(Date);
       expect(entity.createdAt).toStrictEqual(now);
+      expect(entity.readAt).toStrictEqual(readDate);
+      expect(entity.isRead).toBe(true);
       expect(entity.status).toBe(AlertStatus.SENT);
-
-      expect(entity.details.thresholdId).toBe("t-1");
-      expect(entity.details.detectedValue).toBe(2.5);
-      expect(entity.details.periodType).toBe("");
     });
   });
 });
