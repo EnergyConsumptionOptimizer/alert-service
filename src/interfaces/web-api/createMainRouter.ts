@@ -16,6 +16,8 @@ const createPublicRouter = (
 ): Router => {
   const router = Router();
 
+  router.get("/unread-count", auth.authenticate, controller.getUnreadCount);
+
   router
     .route("/")
     .get(auth.authenticate, controller.getAll)
@@ -26,7 +28,6 @@ const createPublicRouter = (
     .get(auth.authenticate, controller.getById)
     .delete(auth.authenticateAdmin, controller.deleteOne);
 
-  router.get("/unread-count", auth.authenticate, controller.getUnreadCount);
   router.patch("/:id/read", auth.authenticate, controller.markAsRead);
 
   return router;
