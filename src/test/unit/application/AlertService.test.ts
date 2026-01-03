@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-
+import { describe, it, expect, beforeEach } from "vitest";
+import { mock, mockReset } from "vitest-mock-extended";
 import { AlertRepository } from "@domain/port/AlertRepository";
 import { AlertSender } from "@application/port/AlertSender";
 import { CreateAlertCommand } from "@application/port/CreateAlertCommand";
@@ -10,15 +10,8 @@ import { AlertService } from "@application/AlertService";
 import { AlertNotFoundError } from "@application/errors";
 
 describe("AlertService", () => {
-  const mockRepo = {
-    save: vi.fn(),
-    findById: vi.fn(),
-    findAll: vi.fn(),
-  } as unknown as AlertRepository;
-
-  const mockSender = {
-    send: vi.fn(),
-  } as unknown as AlertSender;
+  const mockRepo = mock<AlertRepository>();
+  const mockSender = mock<AlertSender>();
 
   const service = new AlertService(mockRepo, mockSender);
 
@@ -33,29 +26,32 @@ describe("AlertService", () => {
   };
 
   beforeEach(() => {
-    vi.clearAllMocks();
+    mockReset(mockRepo);
+    mockReset(mockSender);
   });
 
   describe("createAndSend", () => {
     it("should create, save, send, and update alert status to SENT", async () => {
       const resultId = await service.createAndSend(command);
-      expect(resultId).toBeInstanceOf(AlertId);
 
+      expect(resultId).toBeInstanceOf(AlertId);
       expect(mockSender.send).toHaveBeenCalledTimes(1);
 
       expect(mockRepo.save).toHaveBeenCalledTimes(2);
 
-      const lastSavedAlert = vi.mocked(mockRepo.save).mock.calls[1][0] as Alert;
+      const lastSavedAlert = mockRepo.save.mock.calls[1][0];
       expect(lastSavedAlert.status).toBe(AlertStatus.SENT);
     });
 
     it("should mark alert as FAILED if sending throws an error", async () => {
       const errorMsg = "SMTP Timeout";
-      vi.mocked(mockSender.send).mockRejectedValueOnce(new Error(errorMsg));
+      mockSender.send.mockRejectedValue(new Error(errorMsg));
+
       await service.createAndSend(command);
+
       expect(mockRepo.save).toHaveBeenCalledTimes(2);
 
-      const lastSavedAlert = vi.mocked(mockRepo.save).mock.calls[1][0] as Alert;
+      const lastSavedAlert = mockRepo.save.mock.calls[1][0];
       expect(lastSavedAlert.status).toBe(AlertStatus.FAILED);
       expect(lastSavedAlert.failReason).toBe(errorMsg);
     });
@@ -66,7 +62,7 @@ describe("AlertService", () => {
       const idString = "valid-uuid";
       const mockAlert = { id: { value: idString } } as unknown as Alert;
 
-      vi.mocked(mockRepo.findById).mockResolvedValueOnce(mockAlert);
+      mockRepo.findById.mockResolvedValue(mockAlert);
 
       const result = await service.getById(idString);
 
@@ -75,7 +71,8 @@ describe("AlertService", () => {
     });
 
     it("should throw AlertNotFoundError if repository returns null", async () => {
-      vi.mocked(mockRepo.findById).mockResolvedValueOnce(null);
+      mockRepo.findById.mockResolvedValue(null);
+
       const validId = "valid-uuid-format";
       await expect(service.getById(validId)).rejects.toThrow(
         AlertNotFoundError,
@@ -86,12 +83,36 @@ describe("AlertService", () => {
   describe("getAll", () => {
     it("should return all alerts from repository", async () => {
       const mockAlerts = [{}, {}] as Alert[];
-      vi.mocked(mockRepo.findAll).mockResolvedValueOnce(mockAlerts);
+      mockRepo.findAll.mockResolvedValue(mockAlerts);
 
       const result = await service.getAll();
 
       expect(result).toBe(mockAlerts);
-      expect(mockRepo.findAll).toHaveBeenCalled();
+    });
+  });
+
+  describe("deleteOne", () => {
+    it("should delegate deletion to the repository with correct AlertId", async () => {
+      const idString = "valid-uuid-to-delete";
+      mockRepo.deleteOne.mockResolvedValue(undefined);
+
+      await service.deleteOne(idString);
+
+      expect(mockRepo.deleteOne).toHaveBeenCalledTimes(1);
+
+      const calledArg = mockRepo.deleteOne.mock.calls[0][0];
+      expect(calledArg).toBeInstanceOf(AlertId);
+      expect(calledArg.value).toBe(idString);
+    });
+  });
+
+  describe("deleteAll", () => {
+    it("should delegate deleteAll to the repository", async () => {
+      mockRepo.deleteAll.mockResolvedValue(undefined);
+
+      await service.deleteAll();
+
+      expect(mockRepo.deleteAll).toHaveBeenCalledTimes(1);
     });
   });
 });

@@ -11,22 +11,76 @@ describe("Public API Integration (AlertController)", () => {
     vi.clearAllMocks();
   });
 
-  it("GET /api/:id - should return 200 and formatted JSON", async () => {
-    const alert = AlertFactory.createPending("abc-123");
-    mockAlertService.getById.calledWith("abc-123").mockResolvedValue(alert);
+  describe("GET /api/:id", () => {
+    it("should return 200 and the alert details", async () => {
+      const alert = AlertFactory.createPending("abc-123");
+      mockAlertService.getById.calledWith("abc-123").mockResolvedValue(alert);
 
-    const res = await request(app).get("/api/abc-123");
+      const res = await request(app).get("/api/abc-123");
 
-    expect(res.status).toBe(200);
-    expect(res.body.data.id).toBe("abc-123");
-    expect(res.body.data.message).toContain("exceeded by");
-    expect(mockAlertService.getById).toHaveBeenCalledWith("abc-123");
+      expect(res.status).toBe(200);
+      expect(res.body.data.id).toBe("abc-123");
+      expect(res.body.data.message).toContain("exceeded by");
+    });
+
+    it("should return 404 when alert does not exist", async () => {
+      mockAlertService.getById.mockRejectedValue(new AlertNotFoundError("999"));
+
+      const res = await request(app).get("/api/999");
+
+      expect(res.status).toBe(404);
+      expect(res.body.error).toBe("Alert with id 999 not found");
+    });
   });
 
-  it("GET /api/:id - should return 404 if not found", async () => {
-    mockAlertService.getById.mockRejectedValue(new AlertNotFoundError("999"));
-    const res = await request(app).get("/api/999");
-    expect(res.status).toBe(404);
-    expect(res.body.error).toBe("Alert with id 999 not found");
+  describe("GET /api/", () => {
+    it("should return 200 and a list of alerts", async () => {
+      const alert1 = AlertFactory.createPending("id-1");
+      const alert2 = AlertFactory.createPending("id-2");
+      mockAlertService.getAll.mockResolvedValue([alert1, alert2]);
+
+      const res = await request(app).get("/api/");
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.data).toHaveLength(2);
+      expect(res.body.data[0].id).toBe("id-1");
+    });
+
+    it("should return 200 and an empty list if no alerts found", async () => {
+      mockAlertService.getAll.mockResolvedValue([]);
+
+      const res = await request(app).get("/api/");
+
+      expect(res.status).toBe(200);
+      expect(res.body.data).toEqual([]);
+    });
+  });
+
+  describe("DELETE /api/:id", () => {
+    it("should delete the specific alert and return success", async () => {
+      const targetId = "abc-123";
+      mockAlertService.deleteOne
+        .calledWith(targetId)
+        .mockResolvedValue(undefined);
+
+      const res = await request(app).delete(`/api/${targetId}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ success: true });
+      expect(mockAlertService.deleteOne).toHaveBeenCalledWith(targetId);
+    });
+  });
+
+  describe("DELETE /api/", () => {
+    it("should delete all alerts and return success", async () => {
+      mockAlertService.deleteAll.mockResolvedValue(undefined);
+
+      const res = await request(app).delete("/api/");
+
+      expect(res.status).toBe(200);
+      expect(res.body).toEqual({ success: true });
+      expect(mockAlertService.deleteAll).toHaveBeenCalledTimes(1);
+    });
   });
 });

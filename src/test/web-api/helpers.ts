@@ -18,6 +18,11 @@ mockAuthMiddleware.authenticate.mockImplementation((req, res, next) => {
   return Promise.resolve();
 });
 
+mockAuthMiddleware.authenticateAdmin.mockImplementation((req, res, next) => {
+  next();
+  return Promise.resolve();
+});
+
 mockSseSender.addClient.mockImplementation((res) => {
   res.end();
 });
