@@ -4,7 +4,15 @@ import { AlertModel } from "./AlertSchema";
 import { AlertId } from "@domain/value/AlertId";
 import { Alert } from "@domain/Alert";
 
+/**
+ * MongoDB implementation of `AlertRepository` using Mongoose.
+ */
 export class MongoAlertRepository implements AlertRepository {
+  /**
+   * Persists the alert to MongoDB (upsert).
+   *
+   * @param alert - The domain alert to persist.
+   */
   async save(alert: Alert): Promise<void> {
     const raw = AlertMapper.toPersistence(alert);
     await AlertModel.findByIdAndUpdate(raw._id, raw, {

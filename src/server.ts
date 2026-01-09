@@ -10,6 +10,11 @@ import { InternalAlertController } from "@interfaces/web-api/internal/InternalAl
 import { createMainRouter } from "@interfaces/web-api/createMainRouter";
 import { createApp } from "./app";
 
+/**
+ * Constructs application wiring (repositories, services, controllers) and returns an Express app.
+ *
+ * @returns The composed Express application.
+ */
 export const composeApp = (): Application => {
   const repository = new MongoAlertRepository();
   const sender = new SseSender();

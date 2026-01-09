@@ -4,6 +4,12 @@ import { AlertStatus } from "@domain/value/AlertStatus";
 import { Alert } from "@domain/Alert";
 import { AlertDocument } from "./AlertSchema";
 
+/**
+ * Converts a domain `Alert` into a persistence document.
+ *
+ * @param entity - The domain alert to convert.
+ * @returns The `AlertDocument` ready for persistence.
+ */
 export function toPersistence(entity: Alert): AlertDocument {
   return {
     _id: entity.id.value,
@@ -24,6 +30,13 @@ export function toPersistence(entity: Alert): AlertDocument {
   } as AlertDocument;
 }
 
+/**
+ * Reconstructs a domain `Alert` from a persistence document.
+ *
+ * @param doc - The persisted alert document.
+ * @returns The restored `Alert` instance.
+ * @throws {Error} When required details are missing from the document.
+ */
 export function toDomain(doc: AlertDocument): Alert {
   if (!doc.details) {
     throw new Error(

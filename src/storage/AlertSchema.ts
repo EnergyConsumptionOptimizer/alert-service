@@ -31,5 +31,12 @@ const AlertSchema = new Schema(
   },
 );
 
+/**
+ * Mongoose document type for persisted alerts.
+ */
 export type AlertDocument = InferSchemaType<typeof AlertSchema>;
+
+/**
+ * Mongoose model for alerts collection.
+ */
 export const AlertModel = model("Alert", AlertSchema);

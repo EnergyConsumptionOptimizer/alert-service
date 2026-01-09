@@ -4,12 +4,26 @@ import * as AlertPresenter from "./presenter/AlertPresenter";
 import { SseSender } from "@interfaces/web-api/SseSender";
 import { UpdateReadStateAlertSchema } from "@presentation/CreateAlertSchema";
 
+/**
+ * Exposes public HTTP endpoints for alert operations.
+ */
 export class AlertController {
+  /**
+   * @param service - The alert application service used to fulfill requests.
+   * @param sse - The SSE sender used for streaming alerts to clients.
+   */
   constructor(
     private readonly service: AlertService,
     private readonly sse: SseSender,
   ) {}
 
+  /**
+   * Retrieves a single alert by identifier and returns its representation.
+   *
+   * @param req - The incoming request.
+   * @param res - The response used to send the alert payload.
+   * @param next - The next middleware function for error handling.
+   */
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const alert = await this.service.getById(req.params.id);
@@ -20,6 +34,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Retrieves all alerts and returns their representations.
+   *
+   * @param _req - The incoming request (unused).
+   * @param res - The response used to send the alerts payload.
+   * @param next - The next middleware function for error handling.
+   */
   getAll = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const alerts = await this.service.getAll();
@@ -30,6 +51,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Returns the count of unread alerts.
+   *
+   * @param _req - The incoming request (unused).
+   * @param res - The response used to send the count.
+   * @param next - The next middleware function for error handling.
+   */
   getUnreadCount = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       const count = await this.service.getUnreadCount();
@@ -39,6 +67,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Registers the response as an SSE client for real-time alerts.
+   *
+   * @param _req - The incoming request (unused).
+   * @param res - The response registered as an SSE client.
+   * @param next - The next middleware function for error handling.
+   */
   subscribe = (_req: Request, res: Response, next: NextFunction) => {
     try {
       this.sse.addClient(res);
@@ -47,6 +82,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Updates the read state of an alert based on request payload.
+   *
+   * @param req - The incoming request containing the read DTO.
+   * @param res - The response used to send the result.
+   * @param next - The next middleware function for error handling.
+   */
   updateReadState = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const dto = UpdateReadStateAlertSchema.parse(req.body);
@@ -60,6 +102,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Deletes a single alert by identifier.
+   *
+   * @param req - The incoming request.
+   * @param res - The response used to send the deletion result.
+   * @param next - The next middleware function for error handling.
+   */
   deleteOne = async (req: Request, res: Response, next: NextFunction) => {
     try {
       await this.service.deleteOne(req.params.id);
@@ -69,6 +118,13 @@ export class AlertController {
     }
   };
 
+  /**
+   * Deletes all alerts.
+   *
+   * @param _req - The incoming request (unused).
+   * @param res - The response used to send the deletion result.
+   * @param next - The next middleware function for error handling.
+   */
   deleteAll = async (_req: Request, res: Response, next: NextFunction) => {
     try {
       await this.service.deleteAll();

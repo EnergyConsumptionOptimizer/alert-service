@@ -7,6 +7,9 @@ interface SseResponse extends Response {
   flush?: () => void;
 }
 
+/**
+ * Broadcasts alerts to connected Server-Sent Events (SSE) clients.
+ */
 export class SseSender implements AlertSender {
   private readonly clients = new Set<SseResponse>();
 
@@ -14,6 +17,11 @@ export class SseSender implements AlertSender {
     setInterval(() => this.heartbeat(), 30_000).unref();
   }
 
+  /**
+   * Sends an alert to all connected SSE clients.
+   *
+   * @param alert - The domain alert to broadcast.
+   */
   public async send(alert: Alert): Promise<void> {
     const payload = AlertPresenter.toResponse(alert);
 
@@ -24,6 +32,11 @@ export class SseSender implements AlertSender {
     );
   }
 
+  /**
+   * Adds an HTTP response as an SSE client and initializes the stream.
+   *
+   * @param res - The Express response object to register as an SSE client.
+   */
   public addClient(res: Response): void {
     res.writeHead(200, {
       "Content-Type": "text/event-stream",

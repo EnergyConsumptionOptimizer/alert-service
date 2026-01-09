@@ -3,6 +3,17 @@ import { BreachDetails } from "./value/BreachDetails";
 import { AlertId } from "./value/AlertId";
 import { parseISO8601DateTime } from "./utils/dateUtils";
 
+/**
+ * Represents an alert aggregate with breach details and lifecycle operations.
+ *
+ * @param id - The alert identifier.
+ * @param details - The breach details associated with the alert.
+ * @param createdAt - The timestamp when the alert was created.
+ * @param _status - The current delivery status of the alert.
+ * @param _sentAt - The timestamp when the alert was sent, if any.
+ * @param _failReason - The failure reason when sending fails, if any.
+ * @param _readAt - The timestamp when the alert was read, if any.
+ */
 export class Alert {
   private constructor(
     public readonly id: AlertId,

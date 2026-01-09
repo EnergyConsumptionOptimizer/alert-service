@@ -32,6 +32,14 @@ const createPublicRouter = (
   return router;
 };
 
+/**
+ * Creates the main application router with public and internal alert routes.
+ *
+ * @param publicController - Controller handling public alert endpoints.
+ * @param internalController - Controller handling internal alert creation.
+ * @param authMiddleware - Authentication middleware instance.
+ * @returns The composed Express router.
+ */
 export function createMainRouter(
   publicController: AlertController,
   internalController: InternalAlertController,

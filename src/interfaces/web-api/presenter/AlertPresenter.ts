@@ -1,5 +1,11 @@
 import { Alert } from "@domain/Alert";
 
+/**
+ * Converts a domain `Alert` into a transport-friendly response object.
+ *
+ * @param alert - The domain alert to convert.
+ * @returns A plain object suitable for JSON responses.
+ */
 export function toResponse(alert: Alert) {
   return {
     id: alert.id.toString(),

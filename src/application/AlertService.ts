@@ -6,12 +6,24 @@ import { AlertSender } from "@application/port/AlertSender";
 import { CreateAlertCommand } from "@application/port/CreateAlertCommand";
 import { AlertNotFoundError } from "@application/errors";
 
+/**
+ * Coordinates alert creation, delivery, and repository operations.
+ *
+ * @param repository - The persistence implementation for alerts.
+ * @param sender - The transport responsible for sending alerts.
+ */
 export class AlertService {
   constructor(
     private readonly repository: AlertRepository,
     private readonly sender: AlertSender,
   ) {}
 
+  /**
+   * Creates an alert from the given command, attempts delivery, and persists state.
+   *
+   * @param command - The data required to create the alert.
+   * @returns The created alert identifier.
+   */
   async createAndSend(command: CreateAlertCommand): Promise<AlertId> {
     const details = new BreachDetails(
       command.thresholdId,
@@ -38,6 +50,13 @@ export class AlertService {
     return alert.id;
   }
 
+  /**
+   * Retrieves an alert by its string identifier.
+   *
+   * @param id - The string identifier of the alert.
+   * @returns The `Alert` instance when found.
+   * @throws If no alert exists for the provided identifier.
+   */
   async getById(id: string): Promise<Alert> {
     const alertId = AlertId.of(id);
     const alert = await this.repository.findById(alertId);
@@ -46,7 +65,6 @@ export class AlertService {
     }
     return alert;
   }
-
   async getAll(): Promise<Alert[]> {
     return this.repository.findAll();
   }

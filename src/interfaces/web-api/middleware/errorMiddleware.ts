@@ -4,6 +4,14 @@ import { InvalidAlertIdError } from "@domain/errors";
 import { InvalidTokenError } from "./AuthMiddleware";
 import { AlertNotFoundError } from "@application/errors";
 
+/**
+ * Handles errors thrown during request processing and maps them to HTTP responses.
+ *
+ * @param err - The caught error.
+ * @param _req - The originating request.
+ * @param res - The response used to send the error payload.
+ * @param _next - The next middleware function.
+ */
 export const errorMiddleware = (
   err: unknown,
   _req: Request,
