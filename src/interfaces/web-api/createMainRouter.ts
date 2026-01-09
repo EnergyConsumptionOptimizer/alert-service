@@ -6,7 +6,6 @@ import { AuthMiddleware } from "./middleware/AuthMiddleware";
 const createInternalRouter = (controller: InternalAlertController): Router => {
   const router = Router();
   router.post("/", controller.create);
-  router.get("/stream", controller.subscribe);
   return router;
 };
 
@@ -16,6 +15,7 @@ const createPublicRouter = (
 ): Router => {
   const router = Router();
 
+  router.get("/stream", auth.authenticate, controller.subscribe);
   router.get("/unread-count", auth.authenticate, controller.getUnreadCount);
 
   router
@@ -26,9 +26,8 @@ const createPublicRouter = (
   router
     .route("/:id")
     .get(auth.authenticate, controller.getById)
+    .patch(auth.authenticate, controller.updateReadState)
     .delete(auth.authenticateAdmin, controller.deleteOne);
-
-  router.patch("/:id/read", auth.authenticate, controller.markAsRead);
 
   return router;
 };
@@ -40,8 +39,11 @@ export function createMainRouter(
 ): Router {
   const router = Router();
 
-  router.use("/api", createPublicRouter(publicController, authMiddleware));
-  router.use("/internal", createInternalRouter(internalController));
+  router.use("/api/internal/alerts", createInternalRouter(internalController));
+  router.use(
+    "/api/alerts",
+    createPublicRouter(publicController, authMiddleware),
+  );
 
   return router;
 }

@@ -10,4 +10,6 @@ export const CreateAlertSchema = z.object({
   detectedValue: z.number(),
 });
 
-export type CreateAlertDto = z.infer<typeof CreateAlertSchema>;
+export const UpdateReadStateAlertSchema = z.object({
+  read: z.boolean(),
+});

@@ -1,9 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 import { AlertService } from "@application/AlertService";
 import * as AlertPresenter from "./presenter/AlertPresenter";
+import { SseSender } from "@interfaces/web-api/SseSender";
+import { UpdateReadStateAlertSchema } from "@presentation/CreateAlertSchema";
 
 export class AlertController {
-  constructor(private readonly service: AlertService) {}
+  constructor(
+    private readonly service: AlertService,
+    private readonly sse: SseSender,
+  ) {}
 
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -34,9 +39,21 @@ export class AlertController {
     }
   };
 
-  markAsRead = async (req: Request, res: Response, next: NextFunction) => {
+  subscribe = (_req: Request, res: Response, next: NextFunction) => {
     try {
-      await this.service.markAsRead(req.params.id);
+      this.sse.addClient(res);
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  updateReadState = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const dto = UpdateReadStateAlertSchema.parse(req.body);
+      if (dto.read) {
+        await this.service.markAsRead(req.params.id);
+      }
+
       res.status(204).send();
     } catch (error) {
       next(error);

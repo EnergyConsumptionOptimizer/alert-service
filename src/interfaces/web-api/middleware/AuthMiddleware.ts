@@ -14,9 +14,7 @@ export interface AuthenticatedRequest extends Request {
 }
 
 export class AuthMiddleware {
-  private readonly USER_SERVICE_URI =
-    process.env.USER_SERVICE_URI ||
-    `http://${process.env.USER_SERVICE_HOST || "user"}:${process.env.USER_SERVICE_PORT || 3000}`;
+  constructor(private readonly user_service_uri: string) {}
 
   private getAuthTokenFromCookies(request: Request): string {
     const token = request.cookies?.["authToken"];
@@ -33,7 +31,7 @@ export class AuthMiddleware {
   ) {
     try {
       const token = this.getAuthTokenFromCookies(request);
-      const response = await axios.get(this.USER_SERVICE_URI + `${endpoint}`, {
+      const response = await axios.get(this.user_service_uri + `${endpoint}`, {
         headers: {
           Cookie: `authToken=${token}`,
         },
