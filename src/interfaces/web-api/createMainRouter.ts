@@ -44,6 +44,7 @@ export function createMainRouter(
     "/api/alerts",
     createPublicRouter(publicController, authMiddleware),
   );
+  router.get("/health", (_req, res) => res.send("OK"));
 
   return router;
 }
