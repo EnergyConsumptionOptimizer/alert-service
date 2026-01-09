@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import request from "supertest";
-import { createTestApp, mockAlertService } from "./helpers";
+import { createTestApp, mockAlertService, mockSseSender } from "./helpers";
 import { AlertFactory } from "./factories";
 import { AlertNotFoundError } from "@application/errors";
 
@@ -11,12 +11,12 @@ describe("Public API Integration (AlertController)", () => {
     vi.clearAllMocks();
   });
 
-  describe("GET /api/:id", () => {
+  describe("GET /api/alerts/:id", () => {
     it("should return 200 and the alert details", async () => {
       const alert = AlertFactory.createPending("abc-123");
       mockAlertService.getById.calledWith("abc-123").mockResolvedValue(alert);
 
-      const res = await request(app).get("/api/abc-123");
+      const res = await request(app).get("/api/alerts/abc-123");
 
       expect(res.status).toBe(200);
       expect(res.body.data.id).toBe("abc-123");
@@ -26,20 +26,20 @@ describe("Public API Integration (AlertController)", () => {
     it("should return 404 when alert does not exist", async () => {
       mockAlertService.getById.mockRejectedValue(new AlertNotFoundError("999"));
 
-      const res = await request(app).get("/api/999");
+      const res = await request(app).get("/api/alerts/999");
 
       expect(res.status).toBe(404);
       expect(res.body.error).toBe("Alert with id 999 not found");
     });
   });
 
-  describe("GET /api/", () => {
+  describe("GET /api/alerts", () => {
     it("should return 200 and a list of alerts", async () => {
       const alert1 = AlertFactory.createPending("id-1");
       const alert2 = AlertFactory.createPending("id-2");
       mockAlertService.getAll.mockResolvedValue([alert1, alert2]);
 
-      const res = await request(app).get("/api/");
+      const res = await request(app).get("/api/alerts");
 
       expect(res.status).toBe(200);
       expect(res.body.success).toBe(true);
@@ -50,21 +50,21 @@ describe("Public API Integration (AlertController)", () => {
     it("should return 200 and an empty list if no alerts found", async () => {
       mockAlertService.getAll.mockResolvedValue([]);
 
-      const res = await request(app).get("/api/");
+      const res = await request(app).get("/api/alerts");
 
       expect(res.status).toBe(200);
       expect(res.body.data).toEqual([]);
     });
   });
 
-  describe("DELETE /api/:id", () => {
+  describe("DELETE /api/alerts/:id", () => {
     it("should delete the specific alert and return success", async () => {
       const targetId = "abc-123";
       mockAlertService.deleteOne
         .calledWith(targetId)
         .mockResolvedValue(undefined);
 
-      const res = await request(app).delete(`/api/${targetId}`);
+      const res = await request(app).delete(`/api/alerts/${targetId}`);
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true });
@@ -72,11 +72,11 @@ describe("Public API Integration (AlertController)", () => {
     });
   });
 
-  describe("DELETE /api/", () => {
+  describe("DELETE /api/alerts/", () => {
     it("should delete all alerts and return success", async () => {
       mockAlertService.deleteAll.mockResolvedValue(undefined);
 
-      const res = await request(app).delete("/api/");
+      const res = await request(app).delete("/api/alerts/");
 
       expect(res.status).toBe(200);
       expect(res.body).toEqual({ success: true });
@@ -84,11 +84,11 @@ describe("Public API Integration (AlertController)", () => {
     });
   });
 
-  describe("GET /api/unread-count", () => {
+  describe("GET /api/alerts/unread-count", () => {
     it("should return the count of unread alerts", async () => {
       mockAlertService.getUnreadCount.mockResolvedValue(5);
 
-      const res = await request(app).get("/api/unread-count");
+      const res = await request(app).get("/api/alerts/unread-count");
 
       expect(res.status).toBe(200);
       expect(res.body.data.count).toBe(5);
@@ -96,14 +96,16 @@ describe("Public API Integration (AlertController)", () => {
     });
   });
 
-  describe("PATCH /api/:id/read", () => {
+  describe("PATCH /api/alerts/:id", () => {
     it("should mark alert as read and return 204", async () => {
       const targetId = "abc-123";
       mockAlertService.markAsRead
         .calledWith(targetId)
         .mockResolvedValue(undefined);
 
-      const res = await request(app).patch(`/api/${targetId}/read`);
+      const res = await request(app)
+        .patch(`/api/alerts/${targetId}`)
+        .send({ read: true });
 
       expect(res.status).toBe(204);
       expect(mockAlertService.markAsRead).toHaveBeenCalledWith(targetId);
@@ -115,9 +117,17 @@ describe("Public API Integration (AlertController)", () => {
         .calledWith(targetId)
         .mockRejectedValue(new AlertNotFoundError(targetId));
 
-      const res = await request(app).patch(`/api/${targetId}/read`);
+      const res = await request(app).patch(`/api/alerts/${targetId}/read`);
 
       expect(res.status).toBe(404);
+    });
+  });
+
+  describe("GET /api/alerts/stream", () => {
+    it("should add client to SSE", async () => {
+      const res = await request(app).get("/api/alerts/stream");
+      expect(res.status).toBe(200);
+      expect(mockSseSender.addClient).toHaveBeenCalled();
     });
   });
 });

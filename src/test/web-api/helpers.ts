@@ -32,11 +32,8 @@ export function createTestApp() {
   app.use(express.json());
   app.use(cookieParser());
 
-  const alertController = new AlertController(mockAlertService);
-  const internalController = new InternalAlertController(
-    mockAlertService,
-    mockSseSender,
-  );
+  const alertController = new AlertController(mockAlertService, mockSseSender);
+  const internalController = new InternalAlertController(mockAlertService);
 
   const router = createMainRouter(
     alertController,
