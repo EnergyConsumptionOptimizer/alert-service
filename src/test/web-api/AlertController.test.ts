@@ -29,7 +29,7 @@ describe("Public API Integration (AlertController)", () => {
       const res = await request(app).get("/api/alerts/999");
 
       expect(res.status).toBe(404);
-      expect(res.body.error).toBe("Alert with id 999 not found");
+      expect(res.body.message).toBe("Alert with id 999 not found");
     });
   });
 
