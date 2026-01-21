@@ -21,10 +21,25 @@ export class AlertService {
   /**
    * Creates an alert from the given command, attempts delivery, and persists state.
    *
+   * Applies spam mitigation: If an unread alert for the same threshold exists
+   * and was created within the last hour, creation is skipped.
+   *
    * @param command - The data required to create the alert.
-   * @returns The created alert identifier.
+   * @returns The created alert identifier, or null if suppressed.
    */
-  async createAndSend(command: CreateAlertCommand): Promise<AlertId> {
+  async createAndSend(command: CreateAlertCommand): Promise<AlertId | null> {
+    if (command.thresholdType === "ACTUAL") {
+      const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
+      const isDuplicate = await this.repository.existsRecentUnread(
+        command.thresholdId,
+        oneHourAgo,
+      );
+
+      if (isDuplicate) {
+        return null;
+      }
+    }
+
     const details = new BreachDetails(
       command.thresholdId,
       command.thresholdName,

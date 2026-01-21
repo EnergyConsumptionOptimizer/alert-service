@@ -35,6 +35,15 @@ export interface AlertRepository {
   countUnread(): Promise<number>;
 
   /**
+   * Checks if an unread alert exists for a specific threshold created after the given timestamp.
+   *
+   * @param thresholdId - The threshold identifier to check.
+   * @param since - The timestamp to check against (inclusive).
+   * @returns `true` if a recent unread alert exists.
+   */
+  existsRecentUnread(thresholdId: string, since: Date): Promise<boolean>;
+
+  /**
    * Deletes a single alert by identifier.
    *
    * @param id - The identifier of the alert to delete.

@@ -38,6 +38,16 @@ export class MongoAlertRepository implements AlertRepository {
     }).exec();
   }
 
+  async existsRecentUnread(thresholdId: string, since: Date): Promise<boolean> {
+    const count = await AlertModel.countDocuments({
+      "details.thresholdId": thresholdId,
+      createdAt: { $gte: since },
+      $or: [{ readAt: null }, { readAt: { $exists: false } }],
+    }).exec();
+
+    return count > 0;
+  }
+
   async deleteOne(id: AlertId): Promise<void> {
     await AlertModel.deleteOne({ _id: id.value }).exec();
   }

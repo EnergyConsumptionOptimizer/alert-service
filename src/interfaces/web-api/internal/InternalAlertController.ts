@@ -22,6 +22,15 @@ export class InternalAlertController {
     try {
       const dto = CreateAlertSchema.parse(req.body);
       const alertId = await this.service.createAndSend(dto);
+
+      if (!alertId) {
+        res.status(200).json({
+          success: true,
+          message: "Alert suppressed by spam mitigation policy",
+        });
+        return;
+      }
+
       res.status(201).json({
         success: true,
         data: { id: alertId.toString() },
