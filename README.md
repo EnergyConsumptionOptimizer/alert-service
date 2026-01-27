@@ -25,23 +25,20 @@ The service also exposes internal endpoints used by other microservices to gener
 [![Renovate](https://img.shields.io/badge/Renovate-1A1F6C?style=for-the-badge&logo=renovate&logoColor=white)](https://renovatebot.com/)
 
 ## REST API Endpoints
-
-#### Healthcheck
-- `GET /health`
-
 #### Alerts
 - `GET /api/alerts`
 - `DELETE /api/alerts`
-- `GET /api/alerts/:id`
-- `DELETE /api/alerts/:id`
-- `PATCH /api/alerts/:id`
-
+- `GET /api/alerts/{id}`
+- `DELETE /api/alerts/{id}`
+- `PATCH /api/alerts/{id}`
 - `GET /api/alerts/stream`
 - `GET /api/alerts/unread-count`
 
-### Internal API
-
+### Internal - Alerts
 - `POST /api/internal/alerts`
+
+## Documentation
+Documentation of the typescript code base can be found at the [typedoc](https://energyconsumptionoptimizer.github.io/alert-service/).
 
 ## Authors
 - Rares Vasiliu ([rares-vsl](https://github.com/rares-vsl))
