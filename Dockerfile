@@ -1,5 +1,5 @@
 # Stage 1: Build with Gradle
-FROM gradle:9.3.0-jdk-jammy AS build
+FROM gradle:9.3.1-jdk-jammy AS build
 WORKDIR /usr/src/app
 
 COPY gradlew gradle/ ./
