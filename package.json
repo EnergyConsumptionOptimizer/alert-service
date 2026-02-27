@@ -1,7 +1,7 @@
 {
   "name": "template-for-typescript-projects",
   "engines": {
-    "node": "24.13"
+    "node": "24.14"
   },
   "scripts": {
     "clean": "rimraf dist",
