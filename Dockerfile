@@ -1,18 +1,22 @@
-# Stage 1: Build with Gradle
-FROM gradle:9.4.1-jdk-jammy AS build
-WORKDIR /usr/src/app
-
-COPY gradlew gradle/ ./
-COPY build.gradle.kts settings.gradle.kts gradle.properties ./
-RUN ./gradlew --no-daemon dependencies || true
+FROM node:24-alpine AS build
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
 COPY . .
-RUN ./gradlew --no-daemon assemble
+RUN npm run build
 
-# Stage 2: Runtime with Node.js
+FROM node:24-alpine AS dev
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY . .
+EXPOSE 3000
+CMD ["npm", "run", "start:dev"]
+
 FROM node:24-alpine AS runtime
 WORKDIR /app
-COPY --from=build /usr/src/app/dist ./dist
-COPY --from=build /usr/src/app/package*.json ./
-RUN npm install --omit=dev
+COPY --from=build /app/package*.json ./
+RUN npm ci --omit=dev
+COPY --from=build /app/dist ./dist
 EXPOSE 3000
-CMD ["npm", "run", "start"]
+CMD ["node", "dist/server.js"]

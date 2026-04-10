@@ -1,0 +1,54 @@
+# Version Control & OS
+.git
+.gitignore
+.gitattributes
+.DS_Store
+Thumbs.db
+
+# Node.js & Dependency Caches
+node_modules/
+.npm/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# TypeScript / Node Build Outputs
+dist/
+lib/
+out/
+.tsbuildinfo
+
+# Gradle Outputs
+.gradle/
+build/
+bin/
+
+# Environment Variables & Secrets
+.env
+.env.*
+*.pem
+*.key
+*.cert
+
+# IDEs & Editor Configurations
+.idea/
+.vscode/
+*.swp
+*.swo
+*.iml
+*.iws
+*.ipr
+.settings/
+.project
+.classpath
+.factorypath
+
+# Testing & Coverage
+coverage/
+.nyc_output/
+
+# Documentation & Misc
+README.md
+LICENSE
+docs/
