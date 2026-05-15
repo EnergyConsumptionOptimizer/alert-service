@@ -14,7 +14,7 @@ build/
 *.iws
 *.iml
 *.ipr
-out/
+.out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 .idea/
@@ -50,6 +50,7 @@ dist/
 *.js
 *.js.map
 *.d.ts
+!.dependency-cruiser.js
 
 # Node.js dependencies
 node_modules/

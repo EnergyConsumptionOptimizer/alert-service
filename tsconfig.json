@@ -1,27 +1,33 @@
 {
   "compilerOptions": {
-    "target": "es2023",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "rootDir": "./src",
+    "target": "ESNext",
+    "lib": ["ESNext"],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "rootDir": ".",
     "outDir": "./dist",
     "sourceMap": true,
-    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "strict": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "types": ["vitest/globals"],
     "removeComments": false,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "paths": {
-      "@domain/*": ["./domain/*"],
-      "@application/*": ["./application/*"],
-      "@presentation/*": ["./presentation/*"],
-      "@storage/*": ["./storage/*"],
-      "@interfaces/*": ["./interfaces/*"],
+      "@domain/*": ["src/domain/*"],
+      "@application/*": ["src/application/*"],
+      "@presentation/*": ["src/presentation/*"],
+      "@infrastructure/*": ["src/infrastructure/*"],
+      "@bootstrap/*": ["src/bootstrap/*"],
+      "@test/*": ["test/*"],
+      "@root/*": ["src/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": [
+    "src/**/*",
+    "test/**/*",
+    "*.config.ts",
+    "*.config.mts"
+  ]
 }

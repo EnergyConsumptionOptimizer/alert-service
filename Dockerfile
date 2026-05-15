@@ -15,8 +15,10 @@ CMD ["npm", "run", "start:dev"]
 
 FROM node:24-alpine AS runtime
 WORKDIR /app
+ENV NODE_ENV=production
 COPY --from=build /app/package*.json ./
 RUN npm ci --omit=dev
 COPY --from=build /app/dist ./dist
 EXPOSE 3000
-CMD ["node", "dist/server.js"]
+USER node
+CMD ["node", "dist/src/server.js"]
