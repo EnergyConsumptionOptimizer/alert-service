@@ -1,53 +1,44 @@
-import mongoose from "mongoose";
-import { config } from "./config";
-import { Application } from "express";
-import { MongoAlertRepository } from "@storage/MongoAlertRepository";
-import { SseSender } from "@interfaces/web-api/SseSender";
-import { AlertService } from "@application/AlertService";
-import { AuthMiddleware } from "@interfaces/web-api/middleware/AuthMiddleware";
-import { AlertController } from "@interfaces/web-api/AlertController";
-import { InternalAlertController } from "@interfaces/web-api/internal/InternalAlertController";
-import { createMainRouter } from "@interfaces/web-api/createMainRouter";
-import { createApp } from "./app";
+import "dotenv/config";
 
-/**
- * Constructs application wiring (repositories, services, controllers) and returns an Express app.
- *
- * @returns The composed Express application.
- */
-export const composeApp = (): Application => {
-  const repository = new MongoAlertRepository();
-  const sender = new SseSender();
+import { composeApp } from "@bootstrap/composeApp";
+import { config } from "@bootstrap/config";
+import { connectMongo } from "@bootstrap/mongoConnection";
+import { retryForever } from "@bootstrap/retryForever";
+import { setupGracefulShutdown } from "@bootstrap/shutdown";
+import { startInstrumentation } from "@root/instrumentation.js";
+import { createLogger } from "@root/logger.js";
 
-  const service = new AlertService(repository, sender);
+const rootLogger = createLogger(config);
+const logger = rootLogger.child({ component: "Server" });
+const sdk = startInstrumentation(rootLogger);
 
-  const authMiddleware = new AuthMiddleware(config.services.user.uri);
-  const publicController = new AlertController(service, sender);
-  const internalController = new InternalAlertController(service);
+async function start(): Promise<void> {
+	await connectMongo(logger);
 
-  const router = createMainRouter(
-    publicController,
-    internalController,
-    authMiddleware,
-  );
+	const composed = await composeApp(rootLogger);
 
-  return createApp(router);
-};
+	const server = composed.app.listen(config.port, () => {
+		logger.info({ port: config.port }, "listening");
+	});
 
-const start = async () => {
-  try {
-    await mongoose.connect(config.db.uri);
-    console.log("Connected to MongoDB");
+	composed.sseRegistry.start();
 
-    const app = composeApp();
+	void retryForever(
+		"Kafka threshold-breach DLQ producer",
+		async () => composed.thresholdBreachedDlqPublisher.connect(),
+		logger,
+	);
 
-    app.listen(config.server.port, () => {
-      console.log(`Server running on port ${config.server.port}`);
-    });
-  } catch (error) {
-    console.error("Startup failed:", error);
-    process.exit(1);
-  }
-};
+	void retryForever(
+		"Kafka threshold-breach consumer",
+		async () => {
+			await composed.thresholdBreachedConsumer.connect();
+			await composed.thresholdBreachedConsumer.start();
+		},
+		logger,
+	);
 
-start();
+	setupGracefulShutdown(server, composed, sdk, logger);
+}
+
+void start();
