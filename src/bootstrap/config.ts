@@ -9,7 +9,7 @@ export const EnvSchema = z.object({
 	KAFKA_CLIENT_ID: z.string().default("notification-service"),
 	KAFKA_BOOTSTRAP_SERVERS: z.string().default("kafka:9092"),
 	KAFKA_GROUP_ID: z.string().default("notification-service-group"),
-	KAFKA_TOPIC_THRESHOLD_BREACHED: z.string().default("threshold-breach-events"),
+	KAFKA_TOPIC_THRESHOLD_BREACHED: z.string().default("threshold-events"),
 	KAFKA_TOPIC_THRESHOLD_BREACHED_DLQ: z
 		.string()
 		.default("threshold-breach-dlq"),
