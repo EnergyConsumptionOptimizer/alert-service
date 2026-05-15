@@ -81,7 +81,7 @@ jobs:
 
       - run: npm ci
 
-      - run: npx typedoc --entryPointStrategy expand ./src --plugin typedoc-github-theme
+      - run: npm run docs
 
       - name: Deploy to GitHub Pages
         uses: crazy-max/ghaction-github-pages@v5

@@ -18,7 +18,7 @@
     "lint:fix": "biome check --write ./src ./test",
     "format": "biome format --write ./src ./test",
     "format:check": "biome format ./src ./test",
-    "docs": "typedoc --entryPointStrategy expand ./src --plugin typedoc-github-theme",
+    "docs": "typedoc --tsconfig tsconfig.build.json --entryPointStrategy expand ./src --plugin typedoc-github-theme",
     "lint-staged": "lint-staged"
   },
   "lint-staged": {
