@@ -1,6 +1,6 @@
 [versions]
 node-gradle = "7.1.0"
-gitSemVer = "7.0.19"
+gitSemVer = "7.0.20"
 
 [plugins]
 node = { id = "com.github.node-gradle.node", version.ref = "node-gradle" }
