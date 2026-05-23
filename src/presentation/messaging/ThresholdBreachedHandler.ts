@@ -50,7 +50,10 @@ export class ThresholdBreachedHandler {
 	async handle(raw: string): Promise<void> {
 		let message: z.infer<typeof ThresholdBreachedMessageSchema>;
 		try {
-			const json: unknown = JSON.parse(raw);
+			let json: unknown = JSON.parse(raw);
+			if (typeof json === "string") {
+				json = JSON.parse(json);
+			}
 			message = ThresholdBreachedMessageSchema.parse(json);
 		} catch (err) {
 			this.#logger?.warn(

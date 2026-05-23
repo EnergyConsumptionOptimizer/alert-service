@@ -1,14 +1,12 @@
 import { UserRoles } from "@domain/value/UserRole";
 import type { NotificationController } from "@presentation/rest/controllers/NotificationController";
-import { forwardAuth, requireRole } from "@presentation/rest/middleware/auth";
+import { requireRole } from "@presentation/rest/middleware/auth";
 import { validate } from "@presentation/rest/middleware/validate";
 import { NotificationIdParamSchema } from "@presentation/rest/schemas/notification";
 import { Router } from "express";
 
 export function notificationRoutes(controller: NotificationController): Router {
 	const router = Router();
-
-	router.use(forwardAuth);
 
 	router
 		.route("/")
