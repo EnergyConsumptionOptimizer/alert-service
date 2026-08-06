@@ -1,7 +1,7 @@
 {
   "name": "notification-service",
   "engines": {
-    "node": "24.18"
+    "node": "24.19"
   },
   "scripts": {
     "clean": "rimraf dist",
