@@ -15,7 +15,7 @@ node {
 
 buildscript {
     dependencies {
-        classpath("io.github.andreabrighi:conventional-commit-strategy-for-git-sensitive-semantic-versioning-gradle-plugin:2.0.22")
+        classpath("io.github.andreabrighi:conventional-commit-strategy-for-git-sensitive-semantic-versioning-gradle-plugin:2.0.23")
     }
 }
 gitSemVer {
