@@ -69,7 +69,7 @@
     "typedoc-github-theme": "^0.4.0",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^6.0.0",
-    "vitest": "^4.1.6",
+    "vitest": "^5.0.0",
     "vitest-mock-extended": "^5.0.0"
   }
 }
